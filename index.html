@@ -439,56 +439,53 @@ function quitarTyping(){
     }
 }
 
-async function enviarMensaje(){
-
+async function enviarMensaje() {
     const input = document.getElementById("mensaje");
-
     const texto = input.value.trim();
 
-    if(!texto) return;
+    if (!texto) return;
 
-    agregarMensaje(texto,"user");
-
+    agregarMensaje(texto, "user");
     input.value = "";
-
     mostrarTyping();
 
     try {
-            const response = await fetch(WEBHOOK, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    chatInput: texto,
-                    sessionId: "sesion_manual"
-                })
-            });
+        const response = await fetch(WEBHOOK, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                chatInput: texto,
+                sessionId: "sesion_manual"
+            })
+        });
 
-            // 1. Obtenemos los datos
-            const data = await response.json();
-            quitarTyping();
+        // --- AQUÍ ESTÁ EL CAMBIO CRUCIAL ---
+        // 1. Leemos la respuesta como texto primero para limpiar basura
+        const rawText = await response.text();
+        
+        // 2. Extraemos solo lo que parece JSON (llaves {} o corchetes [])
+        const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+        const validJsonStr = jsonMatch ? jsonMatch[0] : rawText;
 
-            // 2. n8n envía [ { "output": "..." } ]. 
-            // Con esto extraemos el primer elemento si es una lista, o el objeto si viene solo.
-            const respuestaLimpia = Array.isArray(data) ? data[0] : data;
-
-            // 3. Mostramos el mensaje buscando en 'output'
-            agregarMensaje(
-                respuestaLimpia.output || respuestaLimpia.respuesta || "Lo siento, hubo un error.",
-                "bot"
-            );
-
-        } catch (error) {
-
+        // 3. Convertimos a objeto real
+        const data = JSON.parse(validJsonStr);
         quitarTyping();
 
+        // 4. Manejamos si n8n envía una lista [ ] o un objeto { }
+        const respuestaLimpia = Array.isArray(data) ? data[0] : data;
+
         agregarMensaje(
-            "Error conectando con el servidor.",
+            respuestaLimpia.output || respuestaLimpia.respuesta || "Lo siento, hubo un error.",
             "bot"
         );
+        // --- FIN DEL CAMBIO ---
 
-        console.error(error);
+    } catch (error) {
+        quitarTyping();
+        agregarMensaje("Error conectando con el servidor.", "bot");
+        console.error("Error detallado:", error);
     }
 }
 
