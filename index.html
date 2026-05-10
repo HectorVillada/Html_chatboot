@@ -453,33 +453,33 @@ async function enviarMensaje(){
 
     mostrarTyping();
 
-    try{
+    try {
+            const response = await fetch(WEBHOOK, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    chatInput: texto,
+                    sessionId: "sesion_manual"
+                })
+            });
 
-        const response = await fetch(WEBHOOK,{
+            // 1. Obtenemos los datos
+            const data = await response.json();
+            quitarTyping();
 
-            method:"POST",
+            // 2. n8n envía [ { "output": "..." } ]. 
+            // Con esto extraemos el primer elemento si es una lista, o el objeto si viene solo.
+            const respuestaLimpia = Array.isArray(data) ? data[0] : data;
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+            // 3. Mostramos el mensaje buscando en 'output'
+            agregarMensaje(
+                respuestaLimpia.output || respuestaLimpia.respuesta || "Lo siento, hubo un error.",
+                "bot"
+            );
 
-            body: JSON.stringify({
-                chatInput: texto,
-                sessionId: "sesion_manual"
-            })
-
-        });
-
-        const data = await response.json();
-
-        quitarTyping();
-
-        agregarMensaje(
-            data.output || data.respuesta || "Lo siento, hubo un error procesando tu mensaje.",
-            "bot"
-        );
-
-    }catch(error){
+        } catch (error) {
 
         quitarTyping();
 
