@@ -393,7 +393,7 @@ body{
 
 <script>
 
-const WEBHOOK = "https://franklin1032.app.n8n.cloud/webhook-test/52de8a96-cd71-4a99-8271-622bc8b288f0";
+const WEBHOOK = "https://franklin1032.app.n8n.cloud/webhook/a62723ca-c978-4383-85ec-77d2ac0e7e94/chat";
 
 const chat = document.getElementById("chat");
 
@@ -464,7 +464,7 @@ async function enviarMensaje(){
             },
 
             body: JSON.stringify({
-                mensaje:texto
+                chatInput: texto
             })
 
         });
@@ -474,7 +474,7 @@ async function enviarMensaje(){
         quitarTyping();
 
         agregarMensaje(
-            data.respuesta || data.output || "No se recibió respuesta del servidor.",
+            data.respuesta || data.output || "Lo siento, hubo un error procesando tu mensaje.",
             "bot"
         );
 
@@ -493,14 +493,7 @@ async function enviarMensaje(){
 
 </script>
 
-<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-<script type="module">
-	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
-	createChat({
-		webhookUrl: "https://franklin1032.app.n8n.cloud/webhook/a62723ca-c978-4383-85ec-77d2ac0e7e94/chat"
-	});
-</script>
 
 </body>
 </html>
