@@ -452,39 +452,34 @@ async function enviarMensaje() {
     try {
         const response = await fetch(WEBHOOK, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 chatInput: texto,
                 sessionId: "sesion_manual"
             })
         });
 
-        // --- AQUÍ ESTÁ EL CAMBIO CRUCIAL ---
-        // 1. Leemos la respuesta como texto primero para limpiar basura
+        // 1. Leemos todo el bloque de texto (incluyendo la basura de LangChain)
         const rawText = await response.text();
         
-        // 2. Extraemos solo lo que parece JSON (llaves {} o corchetes [])
+        // 2. FILTRO MÁGICO: Buscamos solo el JSON válido dentro de todo ese texto
         const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        const validJsonStr = jsonMatch ? jsonMatch[0] : rawText;
-
-        // 3. Convertimos a objeto real
-        const data = JSON.parse(validJsonStr);
+        if (!jsonMatch) throw new Error("No se encontró un JSON válido");
+        
+        const data = JSON.parse(jsonMatch[0]);
         quitarTyping();
 
-        // 4. Manejamos si n8n envía una lista [ ] o un objeto { }
-        const respuestaLimpia = Array.isArray(data) ? data[0] : data;
+        // 3. Extraemos el mensaje. n8n suele ponerlo en 'output'
+        const r = Array.isArray(data) ? data[0] : data;
+        
+        // Buscamos en orden de prioridad los campos donde n8n guarda la respuesta
+        const mensajeFinal = r.output || r.text || r.response || "Mensaje recibido, pero formato desconocido.";
 
-        agregarMensaje(
-            respuestaLimpia.output || respuestaLimpia.respuesta || "Lo siento, hubo un error.",
-            "bot"
-        );
-        // --- FIN DEL CAMBIO ---
+        agregarMensaje(mensajeFinal, "bot");
 
     } catch (error) {
         quitarTyping();
-        agregarMensaje("Error conectando con el servidor.", "bot");
+        agregarMensaje("Error en la comunicación con el bot.", "bot");
         console.error("Error detallado:", error);
     }
 }
