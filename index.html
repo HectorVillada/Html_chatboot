@@ -475,7 +475,7 @@ async function enviarMensaje(){
         quitarTyping();
 
         agregarMensaje(
-            data.respuesta || data.output || "Lo siento, hubo un error procesando tu mensaje.",
+            data.output || data.respuesta || "Lo siento, hubo un error procesando tu mensaje.",
             "bot"
         );
 
