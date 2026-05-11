@@ -459,27 +459,27 @@ async function enviarMensaje() {
             })
         });
 
-        // 1. Leemos todo el bloque de texto (incluyendo la basura de LangChain)
+        // 1. Leemos la respuesta como texto bruto
         const rawText = await response.text();
-        
-        // 2. FILTRO MÁGICO: Buscamos solo el JSON válido dentro de todo ese texto
+        console.log("Respuesta bruta de n8n:", rawText);
+
+        // 2. LA MAGIA: Buscamos solo el primer JSON válido. 
+        // Esto ignora cualquier basura técnica que n8n pegue al final.
         const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        if (!jsonMatch) throw new Error("No se encontró un JSON válido");
+        if (!jsonMatch) throw new Error("No se encontró una respuesta válida");
         
         const data = JSON.parse(jsonMatch[0]);
         quitarTyping();
 
-        // 3. Extraemos el mensaje. n8n suele ponerlo en 'output'
+        // 3. Extraemos el mensaje (n8n casi siempre usa el campo 'output')
         const r = Array.isArray(data) ? data[0] : data;
-        
-        // Buscamos en orden de prioridad los campos donde n8n guarda la respuesta
-        const mensajeFinal = r.output || r.text || r.response || "Mensaje recibido, pero formato desconocido.";
+        const mensajeBot = r.output || r.text || r.response || "Lo siento, hubo un error de formato.";
 
-        agregarMensaje(mensajeFinal, "bot");
+        agregarMensaje(mensajeBot, "bot");
 
     } catch (error) {
         quitarTyping();
-        agregarMensaje("Error en la comunicación con el bot.", "bot");
+        agregarMensaje("Error conectando con el servidor.", "bot");
         console.error("Error detallado:", error);
     }
 }
