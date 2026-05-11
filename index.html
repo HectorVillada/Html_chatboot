@@ -5,52 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supermercado XYZ - Tienda Virtual</title>
     
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; }
-        header { background: #2ecc71; color: white; padding: 1rem; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .container { max-width: 1000px; margin: 20px auto; padding: 20px; }
-        .productos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
-        .card img { max-width: 100%; border-radius: 4px; }
-        .card h3 { color: #333; }
-        .precio { color: #27ae60; font-weight: bold; font-size: 1.2rem; }
+        /* Estilos de la Tienda */
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        header { background: #2ecc71; color: white; padding: 2rem; text-align: center; }
+        .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
+        .productos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+        .precio { color: #27ae60; font-weight: bold; font-size: 1.4rem; margin: 10px 0; }
+        button { background: #2ecc71; border: none; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
-        /* Ajuste para el Chat de n8n */
+        /* Ajustes para evitar que el chat se bloquee */
         :root {
             --n8n-chat-primary-color: #2ecc71;
             --n8n-chat-button-background: #2ecc71;
         }
+        /* Asegura que el widget esté sobre todo lo demás */
+        .n8n-chat-widget {
+            z-index: 999999 !important;
+        }
     </style>
-
-    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 </head>
 <body>
 
     <header>
-        <h1>Supermercado XYZ</h1>
-        <p>Tu mercado de confianza, ahora online</p>
+        <h1>🛒 Supermercado XYZ</h1>
+        <p>Calidad y frescura en la puerta de tu casa</p>
     </header>
 
     <div class="container">
-        <h2>Productos Destacados</h2>
+        <h2>Productos en Oferta</h2>
         <div class="productos">
             <div class="card">
-                <img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=200" alt="Frutas">
+                <img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=400" alt="Frutas">
                 <h3>Pack Frutas Frescas</h3>
+                <p>Variedad de temporada 5kg</p>
                 <p class="precio">$15.000</p>
-                <button style="background:#2ecc71; border:none; color:white; padding:10px; border-radius:4px; cursor:pointer;">Añadir</button>
+                <button>Agregar al Carrito</button>
             </div>
             <div class="card">
-                <img src="https://images.unsplash.com/photo-1550583724-125581f77833?w=200" alt="Leche">
-                <h3>Leche Entera 1L</h3>
-                <p class="precio">$4.500</p>
-                <button style="background:#2ecc71; border:none; color:white; padding:10px; border-radius:4px; cursor:pointer;">Añadir</button>
+                <img src="https://images.unsplash.com/photo-1550583724-125581f77833?w=400" alt="Leche">
+                <h3>Leche Entera Premium</h3>
+                <p>Caja de 6 unidades</p>
+                <p class="precio">$27.000</p>
+                <button>Agregar al Carrito</button>
             </div>
             <div class="card">
-                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200" alt="Pan">
-                <h3>Pan Artesanal</h3>
-                <p class="precio">$3.800</p>
-                <button style="background:#2ecc71; border:none; color:white; padding:10px; border-radius:4px; cursor:pointer;">Añadir</button>
+                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" alt="Pan">
+                <h3>Pan Artesanal Hoy</h3>
+                <p>Recién horneado</p>
+                <p class="precio">$4.200</p>
+                <button>Agregar al Carrito</button>
             </div>
         </div>
     </div>
@@ -60,15 +69,15 @@
 
         createChat({
             webhookUrl: 'https://franklin1032.app.n8n.cloud/webhook/a62723ca-c978-4383-85ec-77d2ac0e7e94/chat',
-            title: 'Asistente XYZ',
-            subtitle: 'En línea para ayudarte',
+            title: 'Asistente Supermercado XYZ',
+            subtitle: 'Estamos en línea',
             initialMessages: [
-                '¡Hola! 👋 Soy el asistente virtual de Supermercado XYZ.',
-                '¿En qué puedo ayudarte hoy?'
+                '¡Hola! 👋 Bienvenido a Supermercado XYZ.',
+                '¿Buscas algún producto en especial o quieres consultar tu domicilio?'
             ],
             i18n: {
                 en: {
-                    placeholder: 'Escribe tu duda aquí...',
+                    placeholder: 'Escribe tu mensaje aquí...',
                     sendButtonAriaLabel: 'Enviar mensaje',
                 }
             }
