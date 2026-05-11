@@ -442,7 +442,6 @@ function quitarTyping(){
 async function enviarMensaje() {
     const input = document.getElementById("mensaje");
     const texto = input.value.trim();
-
     if (!texto) return;
 
     agregarMensaje(texto, "user");
@@ -459,31 +458,27 @@ async function enviarMensaje() {
             })
         });
 
-        // 1. Leemos la respuesta como texto bruto
+        // 1. Obtenemos la respuesta como texto
         const rawText = await response.text();
-        console.log("Respuesta bruta de n8n:", rawText);
-
-        // 2. LA MAGIA: Buscamos solo el primer JSON válido. 
-        // Esto ignora cualquier basura técnica que n8n pegue al final.
-        const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        if (!jsonMatch) throw new Error("No se encontró una respuesta válida");
         
-        const data = JSON.parse(jsonMatch[0]);
+        // 2. Extraemos el JSON (esto limpia cualquier basura técnica)
+        const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+        const data = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
+        
         quitarTyping();
 
-        // 3. Extraemos el mensaje (n8n casi siempre usa el campo 'output')
+        // 3. Buscamos el mensaje final (suele estar en 'output')
         const r = Array.isArray(data) ? data[0] : data;
-        const mensajeBot = r.output || r.text || r.response || "Lo siento, hubo un error de formato.";
+        const mensajeFinal = r.output || r.text || r.response || "Error de formato";
 
-        agregarMensaje(mensajeBot, "bot");
+        agregarMensaje(mensajeFinal, "bot");
 
     } catch (error) {
         quitarTyping();
         agregarMensaje("Error conectando con el servidor.", "bot");
-        console.error("Error detallado:", error);
+        console.error("Detalle:", error);
     }
 }
-
 </script>
 
 
